@@ -282,7 +282,8 @@ static void set_unix_security_ctx(uid_t uid, gid_t gid, int ngroups, gid_t *grou
 
 static void set_unix_security_ctx(uid_t uid, gid_t gid, int ngroups, gid_t *groups)
 {
-	int max = groups_max();
+	_Static_assert(NGROUPS_MAX == 16, "initgroups manpage no longer correct?");
+	int max = NGROUPS_MAX; // groups_max();
 
 	/* Start context switch */
 	gain_root();

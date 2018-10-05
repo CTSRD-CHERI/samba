@@ -844,7 +844,18 @@ void sys_srandom(unsigned int seed)
 
 int groups_max(void)
 {
-#if defined(SYSCONF_SC_NGROUPS_MAX)
+#if defined(DARWINOS)
+	/*
+	 * On MacOS sysconf(_SC_NGROUPS_MAX) returns 16 due to MacOS's group
+	 * nesting. However, The initgroups() manpage states the following:
+	 * "Note that OS X supports group mem bership in an unlimited number
+	 * of groups. The OS X kernel uses the group list stored in the process
+	 * credentials only as an initial cache.  Additional group memberships
+	 * are determined by communication between the operating system and the
+	 * opendirectoryd daemon."
+	 */
+	return GID_MAX;
+#elif defined(SYSCONF_SC_NGROUPS_MAX)
 	int ret = sysconf(_SC_NGROUPS_MAX);
 	return (ret == -1) ? NGROUPS_MAX : ret;
 #else
@@ -856,8 +867,8 @@ int groups_max(void)
  Wrap setgroups and getgroups for systems that declare getgroups() as
  returning an array of gid_t, but actuall return an array of int.
 ****************************************************************************/
-
 #if defined(HAVE_BROKEN_GETGROUPS)
+#error "Cannot build on macos with HAVE_BROKEN_GETGROUPS"
 
 #ifdef HAVE_BROKEN_GETGROUPS
 #define GID_T int

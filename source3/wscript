@@ -477,6 +477,9 @@ vsyslog
         conf.DEFINE('DARWINOS', 1)
         conf.ADD_CFLAGS('-fno-common')
         conf.DEFINE('STAT_ST_BLOCKSIZE', '512')
+        # getgrouplist_2() can be used to determine the real maximum number of
+        # groups on macOS since getgrouplist() is limited to 16.
+        conf.CHECK_FUNCS('getgrouplist_2')
     elif (host_os.rfind('freebsd') > -1):
         conf.DEFINE('FREEBSD', 1)
         if conf.CHECK_HEADERS('sunacl.h'):
